@@ -1,0 +1,13 @@
+{
+  "name": "wordcannon_service",
+  "version": "1.0.0",
+  "description": "WordCannon random word service",
+  "author": "Maciek",
+  "main": "service.js",
+  "scripts": {
+    "start": "node service.js"
+  },
+  "dependencies": {
+    "express": "^4.16.1"
+  }
+}
