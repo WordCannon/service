@@ -1,4 +1,4 @@
 #!/bin/bash
 
-docker build -t maciekdna/wordcannon-service .
-docker push maciekdna/wordcannon-service
+docker build -t wordcannon/service .
+docker push wordcannon/service
