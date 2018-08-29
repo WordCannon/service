@@ -1,7 +1,5 @@
-const promBundle = require("express-prom-bundle");
 const express = require('express');
 const words = Object.keys(require("./words.json"));
-const metricsMiddleware = promBundle({includeMethod: true});
 
 const PORT = 8080;
 const HOST = '0.0.0.0';
@@ -12,8 +10,6 @@ const getWord = () => {
 }
 
 const app = express();
-
-app.use(metricsMiddleware);
 
 app.get('/word', (req, res) => {
   res.send(`${getWord()}\n`);
