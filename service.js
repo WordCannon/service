@@ -7,28 +7,37 @@ var weighted = require('weighted')
 const metricsMiddleware = promBundle(
   { 
     includeMethod: true, 
-    buckets: [0.001, 0.005, 0.010, 0.020, 0.030, 0.050, 0.100, 0.200, 0.500, 1.000] 
+    customLabels: {"version":"8"},
+    buckets: [0.050, 0.100, 0.150, 0.200, 0.250, 0.300, 0.350, 0.400, 0.450, 0.500] 
   }
 );
 
 var increasing = true;
-var baseLatency = 0;
+
+var maxLatency = 600;
+var jitter = 0;
+var baseLatency = (maxLatency / 2) * .75;
 
 const PORT = 8080;
 const HOST = '0.0.0.0';
-
-var options = [1,   5,    10,  20,  30,   50,   100,  200,  500,  1000]
-  , weights = [.30, .23, .16, .10, .06,  .05,   .04,  .03,  .02,  .01 ]
 
 const app = express();
 
 app.use(metricsMiddleware);
 
+// base + (base * )
+
 app.get('/word', async (req, res) => {
-  var latency = Math.floor(
-    weighted.select(options, weights) 
-    * ((Math.random() * .5
-  ).toFixed(2))) + baseLatency;
+
+  var bellFactor = 3;
+  var bellcurveRandom = 0;
+  for (var i = 0; i < bellFactor; i++) {
+      bellcurveRandom += Math.random() * (maxLatency / bellFactor);
+  }    
+  bellcurveRandom += jitter;
+
+  const latency = Math.floor(bellcurveRandom);
+
   await delay(latency);
 
   const randIndex = Math.floor(words.length * Math.random());
@@ -42,21 +51,25 @@ app.listen(PORT, HOST);
 console.log(`Firing cannon on http://${HOST}:${PORT}`);
 
 setInterval(() => {
-  if (increasing) {
-    baseLatency += 1;
-  } else {
-    baseLatency = (baseLatency === 0 ? baseLatency : baseLatency - 1);
-  }
+
+  const DIE_SIDES = 3;
+  const roll = Math.ceil(Math.random() * DIE_SIDES); 
+  if (roll < 3) {
+    if (increasing && jitter < 52) {
+      jitter += 10;
+      console.log(`++++++++++++ ${jitter}`);
+    } else if (!increasing && jitter > -52) {
+      jitter -= 10;
+      console.log(`--------------- ${jitter}`);
+    }  
+  } 
 }, 10000)
 
 setInterval(() => {
-  const DIE_SIDES = 20;
+  const DIE_SIDES = 30;
   const roll = Math.ceil(Math.random() * DIE_SIDES); 
-  console.log(`*** Rolled ${DIE_SIDES}-sided die.  Got ${roll}`);
   if (roll === 1) {
-    increasing = !increasing;
-    console.log(`*** Won the dice roll.  Switching "increasing" to ${increasing}`);
-  } else {
-    console.log(`*** Lost the dice roll.  Keeping "increasing" to ${increasing}`);
-  }
-}, 30000)
+    increasing = !increasing;   
+    console.log(`>>>>>>>>>>>>>>> SWITCH <<<<<<<<<<<<<<<< increasing :" to ${increasing}`);
+  } 
+}, 60000)
