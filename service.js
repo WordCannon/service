@@ -7,7 +7,7 @@ var weighted = require('weighted')
 const metricsMiddleware = promBundle(
   { 
     includeMethod: true, 
-    customLabels: {"version":"8"},
+    includePath: true,
     buckets: [0.050, 0.100, 0.150, 0.200, 0.250, 0.300, 0.350, 0.400, 0.450, 0.500] 
   }
 );
@@ -57,10 +57,10 @@ setInterval(() => {
   if (roll < 3) {
     if (increasing && jitter < 52) {
       jitter += 10;
-      console.log(`++++++++++++ ${jitter}`);
+      // console.log(`++++++++++++ ${jitter}`);
     } else if (!increasing && jitter > -52) {
       jitter -= 10;
-      console.log(`--------------- ${jitter}`);
+      // console.log(`--------------- ${jitter}`);
     }  
   } 
 }, 10000)
@@ -70,6 +70,6 @@ setInterval(() => {
   const roll = Math.ceil(Math.random() * DIE_SIDES); 
   if (roll === 1) {
     increasing = !increasing;   
-    console.log(`>>>>>>>>>>>>>>> SWITCH <<<<<<<<<<<<<<<< increasing :" to ${increasing}`);
+    // console.log(`>>>>>>>>>>>>>>> SWITCH <<<<<<<<<<<<<<<< increasing :" to ${increasing}`);
   } 
-}, 60000)
+}, 10000)
