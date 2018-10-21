@@ -1,18 +1,28 @@
 const express = require('express');
 const words = Object.keys(require("./words.json"));
+const metrics = require('./src/metrics');
+const latency = require('./src/latency')
 
 const PORT = 8080;
 const HOST = '0.0.0.0';
 
-const getWord = () => {
-  const randIndex = Math.floor(words.length * Math.random());
-  return words[randIndex];
-}
-
 const app = express();
+app.use(metrics);
 
-app.get('/word', (req, res) => {
-  res.send(`${getWord()}\n`);
+app.get('/word', async (req, res) => {
+
+  var startTime = new Date().getTime();
+
+  await latency.randomDelay();
+
+  const randIndex = Math.floor(words.length * Math.random());
+  var word = words[randIndex];
+
+  var endTime = new Date().getTime();
+  var execTime = endTime - startTime;
+
+  console.log(`/word [${execTime} ms] ${word} `)
+  res.send(`${word}\n`);
 });
 
 app.get('/healthz', function (req, res) {
