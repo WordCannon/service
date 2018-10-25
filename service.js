@@ -3,11 +3,15 @@ const words = Object.keys(require("./words.json"));
 const metrics = require('./src/metrics');
 const latency = require('./src/latency')
 
+const VOWEL_TRIGGER_COUNT = parseInt(process.env.VOWEL_TRIGGER_COUNT) || 10;
+
 const PORT = 8080;
 const HOST = '0.0.0.0';
 
 const app = express();
 app.use(metrics);
+
+var wrenchInGears = false;
 
 app.get('/word', async (req, res) => {
 
@@ -15,15 +19,32 @@ app.get('/word', async (req, res) => {
 
   await latency.randomDelay();
 
-  const randIndex = Math.floor(words.length * Math.random());
-  var word = words[randIndex];
+  var word, code;
+  if (wrenchInGears) {
+    word = "???";
+    code = 500;
+  } else {
+    const randIndex = Math.floor(words.length * Math.random());
+    var word = words[randIndex];
+    var code = 200;  
+  }
 
   var endTime = new Date().getTime();
   var execTime = endTime - startTime;
 
-  console.log(`/word [${execTime} ms] ${word} `)
-  res.send(`${word}\n`);
+  const vowels = countVowels(word);
+  if (vowels === VOWEL_TRIGGER_COUNT) {
+    wrenchInGears = true;
+  }
+
+  res.status(code).send(`${word}\n`);
+  console.log(`/wordz ${code} [${execTime} ms] ${word} (${vowels} vowels)`)
 });
+
+function countVowels(str) {
+  var m = str.match(/[aeiou]/gi);
+  return m === null ? 0 : m.length;
+}
 
 app.get('/healthz', function (req, res) {
   res.send('I am happy and healthy\n');
@@ -54,5 +75,5 @@ function shutdown() {
   })
 }
 
-console.log(`Firing cannon on http://${HOST}:${PORT}`);
+console.log(`Firing cannon on http://${HOST}:${PORT} (Vowel trigger count ${VOWEL_TRIGGER_COUNT})`);
 
