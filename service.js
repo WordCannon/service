@@ -1,9 +1,13 @@
+console.log("WordCannon server starting up...");
+
+const { getWordsList } = require('most-common-words-by-language');
 const express = require('express');
-const words = Object.keys(require("./words.json"));
 const metrics = require('./src/metrics');
 const latency = require('./src/latency')
 
 const VOWEL_TRIGGER_COUNT = parseInt(process.env.VOWEL_TRIGGER_COUNT) || 10;
+const LANGUAGE = process.env.LANGUAGE || "english";
+const NUM_WORDS = process.env.NUM_WORDS || 10000;
 
 const PORT = 8080;
 const HOST = '0.0.0.0';
@@ -12,6 +16,8 @@ const app = express();
 app.use(metrics);
 
 var wrenchInGears = false;
+
+const words = getWordsList(LANGUAGE, NUM_WORDS); 
 
 app.get('/word', async (req, res) => {
 
@@ -38,7 +44,7 @@ app.get('/word', async (req, res) => {
   }
 
   res.status(code).send(`${word}\n`);
-  console.log(`/wordz ${code} [${execTime} ms] ${word} (${vowels} vowels)`)
+  console.log(`/word ${code} [${execTime} ms] ${word} (${vowels} vowels)`)
 });
 
 function countVowels(str) {
