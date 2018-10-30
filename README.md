@@ -40,3 +40,49 @@ docker build -t wordcannon/service .
 ```
 docker run --rm -p 8080:8080 wordcannon/service
 ```
+
+# supported languages
+
+* afrikaans
+* bulgarian
+* danish
+* estonian
+* german
+* hungarian
+* kazakh
+* macedonian
+* romanian
+* slovenian
+* turkish
+* albanian
+* catalan
+* dutch
+* farsi
+* greek
+* indonesian
+* korean
+* norwegian
+* russian
+* spanish
+* ukrainian
+* arabic
+* chinese
+* english
+* finnish
+* hebrew
+* italian
+* latvian
+* polish
+* serbian
+* swedish
+* vietnamese
+* bengali
+* czech
+* esperanto
+* french
+* hindi
+* japanese
+* lithuanian
+* portuguese
+* slovak
+* thai
