@@ -29,4 +29,4 @@ WORKDIR /opt/app
 COPY . /opt/app
 
 # Define what will run when this container starts (and its arg(s))
-ENTRYPOINT [ "node", "word.js" ]
+ENTRYPOINT [ "node", "./services/fancy.js" ]

@@ -2,8 +2,8 @@ console.log("WordCannon server starting up...");
 
 const { getWordsList } = require('most-common-words-by-language');
 const express = require('express');
-const metrics = require('./src/metrics');
-const latency = require('./src/latency')
+const fetch = require("node-fetch");
+const latency = require('../src/latency');
 
 const VOWEL_TRIGGER_COUNT = parseInt(process.env.VOWEL_TRIGGER_COUNT) || 10;
 const LANGUAGE = process.env.LANGUAGE || "english";
@@ -13,38 +13,35 @@ const PORT = 8080;
 const HOST = '0.0.0.0';
 
 const app = express();
-app.use(metrics);
 
 var wrenchInGears = false;
 
-const words = getWordsList(LANGUAGE, NUM_WORDS); 
 
-app.get('/word', async (req, res) => {
+const words = getWordsList(LANGUAGE, NUM_WORDS);
+
+app.get('/dictionary', async (req, res) => {
 
   var startTime = new Date().getTime();
 
   await latency.randomDelay();
 
   var word, code;
-  if (wrenchInGears) {
-    word = "???";
-    code = 500;
-  } else {
-    const randIndex = Math.floor(words.length * Math.random());
-    var word = words[randIndex];
-    var code = 200;  
-  }
+
+  const randIndex = Math.floor(words.length * Math.random());
+  var word = words[randIndex];
+  var code = 200;
 
   var endTime = new Date().getTime();
   var execTime = endTime - startTime;
 
   const vowels = countVowels(word);
   if (vowels === VOWEL_TRIGGER_COUNT) {
-    wrenchInGears = true;
+    word = "???";
+    code = 500;
   }
 
   res.status(code).send(`${word}\n`);
-  console.log(`/word ${code} [${execTime} ms] ${word} (${vowels} vowels)`)
+  console.log(`/dictionary ${code} [${execTime} ms] ${word} (${vowels} vowels)`)
 });
 
 function countVowels(str) {
