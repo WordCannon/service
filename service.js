@@ -8,6 +8,11 @@ const latency = require("./src/latency");
 const LANGUAGE = process.env.LANGUAGE || "english";
 const NUM_WORDS = process.env.NUM_WORDS || 10000;
 
+const SHUTDOWN_GRACE_PERIOD =
+  (process.env.SHUTDOWN_GRACE_PERIOD &&
+    parseInt(process.env.SHUTDOWN_GRACE_PERIOD)) ||
+  10;
+
 const PORT = 8080;
 const HOST = "0.0.0.0";
 
@@ -69,15 +74,55 @@ process.on("SIGTERM", function onSigterm() {
   shutdown();
 });
 
+let sockets = {},
+  nextSocketId = 0;
+server.on("connection", function(socket) {
+  const socketId = nextSocketId++;
+  sockets[socketId] = socket;
+  const numSockets = Object.keys(sockets).length;
+  // console.log(
+  //   ">>> Creating socket: " + socketId + " | " + numSockets + " sockets total"
+  // );
+
+  socket.once("close", function() {
+    delete sockets[socketId];
+    const numSockets = Object.keys(sockets).length;
+    // console.log(
+    //   "<<< Deleting socket: " + socketId + " | " + numSockets + " sockets total"
+    // );
+  });
+});
+
 // shut down server
 function shutdown() {
+  waitForSocketsToClose(SHUTDOWN_GRACE_PERIOD);
   server.close(function onServerClosed(err) {
+    console.log("+++ Got server close event");
     if (err) {
       console.error(err);
       process.exitCode = 1;
     }
+    console.log("exiting in shutdown() with code " + process.exitCode);
     process.exit();
   });
+}
+
+function waitForSocketsToClose(counter) {
+  if (counter > 0) {
+    console.log(
+      `Waiting ${counter} more ${
+        counter === 1 ? "seconds" : "second"
+      } for all connections to close...`
+    );
+    return setTimeout(waitForSocketsToClose, 1000, counter - 1);
+  }
+
+  console.log("Forcing all connections to close now");
+  for (var socketId in sockets) {
+    sockets[socketId].destroy();
+    const numSockets = Object.keys(sockets).length;
+    console.log("!!! Destroying socket: " + socketId);
+  }
 }
 
 console.log(
