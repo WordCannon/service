@@ -1,5 +1,6 @@
 const delay = require("delay");
 var weighted = require("weighted");
+const NodeHog = require('nodehog');
 
 var increasing = true;
 
@@ -35,7 +36,9 @@ const getLatency = function() {
 };
 
 const randomDelay = async function() {
-  return await delay(getLatency());
+  const latency = getLatency();
+  new NodeHog('cpu', latency, 0,).start();
+  return await delay(latency);
 };
 
 // adjust jitter frequently

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export TAG="0.0.14"
+export TAG="0.0.14-cpuhog"
 
 echo "TAG IS $TAG"
 
