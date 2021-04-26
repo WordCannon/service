@@ -13,7 +13,7 @@
     "express": "^4.16.1",
     "express-prom-bundle": "^4.2.1",
     "lodash": "^4.17.13",
-    "most-common-words-by-language": "^2.17.0",
+    "most-common-words-by-language": "^3.0.0",
     "weighted": "^0.3.0"
   }
 }
