@@ -1,4 +1,4 @@
-FROM node:12.13.1
+FROM node:16.11.1
 
 RUN mkdir -p /opt/app
 
