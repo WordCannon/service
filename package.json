@@ -14,6 +14,6 @@
     "express-prom-bundle": "^4.2.1",
     "lodash": "^4.17.13",
     "most-common-words-by-language": "^2.17.0",
-    "weighted": "^0.3.0"
+    "weighted": "^1.0.0"
   }
 }
